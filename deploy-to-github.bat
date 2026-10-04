@@ -1,15 +1,20 @@
 @echo off
-title Push Banka Command Center to GitHub
+title Deploy Banka Command Center to GitHub
 echo =====================================================================
-echo    Deploy Banka Command Center to GitHub Account (Rudraaryan24)
+echo    Deploy Banka Command Center to Your GitHub Account
 echo =====================================================================
 echo.
-echo Make sure you have created an empty repository on GitHub first:
-echo 👉 https://github.com/new
-echo Suggested Repository Name: banka-command-center
+echo 1. Go to GitHub and create a new repository:
+echo    https://github.com/new
+echo 2. Set repository name (e.g. banka-command-center) and click Create.
+echo 3. Copy your repository HTTPS URL.
 echo.
-set /p REPO_URL="Enter your GitHub Repository URL (Press Enter for https://github.com/Rudraaryan24/banka-command-center.git): "
-if "%REPO_URL%"=="" set REPO_URL=https://github.com/Rudraaryan24/banka-command-center.git
+set /p REPO_URL="Paste your GitHub Repository URL: "
+if "%REPO_URL%"=="" (
+    echo Error: No URL provided. Exiting.
+    pause
+    exit /b
+)
 
 echo.
 echo Setting remote origin to: %REPO_URL%
@@ -18,15 +23,16 @@ echo Setting remote origin to: %REPO_URL%
 "C:\Program Files\Git\cmd\git.exe" branch -M main
 
 echo.
-echo Pushing code to GitHub...
+echo Pushing code to your repository...
 "C:\Program Files\Git\cmd\git.exe" push -u origin main
 
 echo.
 echo =====================================================================
-echo Done! If push succeeded, your repository is live on GitHub!
+echo Done! Your code is now deployed to your GitHub repository!
+echo.
 echo To enable GitHub Pages (Free Live Website):
-echo 1. Go to your repo on GitHub: Settings -> Pages
-echo 2. Under 'Source', select 'GitHub Actions'
-echo 3. The site will automatically build and publish!
+echo 1. Open your repository on GitHub: Settings -^> Pages
+echo 2. Under 'Build and deployment' -^> Source, choose: GitHub Actions
+echo 3. The automated workflow will publish your site online!
 echo =====================================================================
 pause
