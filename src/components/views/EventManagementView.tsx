@@ -15,15 +15,18 @@ import {
 import { useCommand } from '../../context/CommandContext';
 import { SystemEvent } from '../../types';
 import { Badge } from '../common/Badge';
+import { CreateEventModal } from '../modals/CreateEventModal';
 
 export const EventManagementView: React.FC = () => {
   const { events, geofences, setActiveTab } = useCommand();
 
   const [filterStatus, setFilterStatus] = useState<string>('all');
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
   const filteredEvents = events.filter(e => {
     if (filterStatus === 'active') return e.status === 'Active';
     if (filterStatus === 'planning') return e.status === 'Planning';
+    if (filterStatus === 'standby') return e.status === 'Standby';
     return true;
   });
 
@@ -58,28 +61,43 @@ export const EventManagementView: React.FC = () => {
           </p>
         </div>
 
-        <button
-          onClick={() => setActiveTab('duty-assignments')}
-          className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-lg shadow-sm transition-all"
-        >
-          <Plus className="w-4 h-4" />
-          <span>Plan Event Roster</span>
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setIsCreateModalOpen(true)}
+            className="flex items-center gap-2 px-3.5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold rounded-lg shadow-sm transition-all"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Add Event Operation</span>
+          </button>
+          <button
+            onClick={() => setActiveTab('duty-assignments')}
+            className="flex items-center gap-2 px-3.5 py-2 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-lg shadow-sm transition-all"
+          >
+            <Calendar className="w-4 h-4" />
+            <span>Plan Event Roster</span>
+          </button>
+        </div>
       </div>
 
       {/* Filter Tabs */}
-      <div className="flex items-center gap-2 border-b border-slate-200 pb-3">
-        {['all', 'active', 'planning'].map(tab => (
+      <div className="flex items-center gap-2 border-b border-slate-200 pb-3 overflow-x-auto">
+        {['all', 'active', 'planning', 'standby'].map(tab => (
           <button
             key={tab}
             onClick={() => setFilterStatus(tab)}
-            className={`px-3 py-1.5 rounded-lg font-semibold transition-all ${
+            className={`px-3 py-1.5 rounded-lg font-semibold whitespace-nowrap transition-all ${
               filterStatus === tab
                 ? 'bg-slate-800 text-white shadow-sm'
                 : 'bg-white hover:bg-slate-100 border border-slate-200 text-slate-700'
             }`}
           >
-            {tab === 'all' ? `All Operations (${events.length})` : tab === 'active' ? 'Active Live Operations' : 'Future Planning'}
+            {tab === 'all'
+              ? `All Operations (${events.length})`
+              : tab === 'active'
+              ? `Active Live Operations (${events.filter(e => e.status === 'Active').length})`
+              : tab === 'planning'
+              ? `Future Planning (${events.filter(e => e.status === 'Planning').length})`
+              : `Standby (${events.filter(e => e.status === 'Standby').length})`}
           </button>
         ))}
       </div>
@@ -182,6 +200,12 @@ export const EventManagementView: React.FC = () => {
           );
         })}
       </div>
+
+      {/* Create Event Modal */}
+      <CreateEventModal
+        isOpen={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+      />
     </div>
   );
 };

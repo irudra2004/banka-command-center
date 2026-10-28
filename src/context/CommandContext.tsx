@@ -66,6 +66,7 @@ interface CommandContextType {
   // Actions
   addDutyAssignment: (duty: Omit<DutyAssignment, 'id'>) => void;
   addGeofence: (zone: Omit<GeofenceZone, 'id'>) => void;
+  addEvent: (event: Omit<SystemEvent, 'id' | 'deployedPersonnelCount' | 'activeIncidentsCount'>) => void;
   reportIncident: (incident: Omit<Incident, 'id' | 'timeline'>) => void;
   acknowledgeAlert: (alertId: string) => void;
   escalateAlert: (alertId: string) => void;
@@ -98,7 +99,7 @@ export const CommandProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   const [emergencyAlerts, setEmergencyAlerts] = useState<EmergencyAlert[]>(INITIAL_ALERTS);
   const [videoFeeds, setVideoFeeds] = useState<VideoFeed[]>(INITIAL_VIDEO_FEEDS);
-  const [events] = useState<SystemEvent[]>(INITIAL_EVENTS);
+  const [events, setEvents] = useState<SystemEvent[]>(INITIAL_EVENTS);
   const [auditLogs, setAuditLogs] = useState<AuditLog[]>(INITIAL_AUDIT_LOGS);
   const [messages, setMessages] = useState<ChatMessage[]>(INITIAL_MESSAGES);
 
@@ -300,6 +301,7 @@ export const CommandProvider: React.FC<{ children: React.ReactNode }> = ({ child
     setIncidents(INITIAL_INCIDENTS);
     setEmergencyAlerts(INITIAL_ALERTS);
     setVideoFeeds(INITIAL_VIDEO_FEEDS);
+    setEvents(INITIAL_EVENTS);
     setAuditLogs(INITIAL_AUDIT_LOGS);
     setMessages(INITIAL_MESSAGES);
     setSelectedPersonnel(null);
@@ -339,6 +341,18 @@ export const CommandProvider: React.FC<{ children: React.ReactNode }> = ({ child
     const newZone: GeofenceZone = { ...zone, id: newId };
     setGeofences(prev => [...prev, newZone]);
     addAuditLog(`Geofence boundary defined: ${zone.name}`, 'Geofencing', 'SUCCESS');
+  };
+
+  const addEvent = (eventData: Omit<SystemEvent, 'id' | 'deployedPersonnelCount' | 'activeIncidentsCount'>) => {
+    const newId = `EVT-0${events.length + 1}`;
+    const newEvent: SystemEvent = {
+      ...eventData,
+      id: newId,
+      deployedPersonnelCount: 0,
+      activeIncidentsCount: 0,
+    };
+    setEvents(prev => [newEvent, ...prev]);
+    addAuditLog(`New major operation added: ${eventData.name}`, 'Settings', 'SUCCESS');
   };
 
   const reportIncident = (incident: Omit<Incident, 'id' | 'timeline'>) => {
@@ -499,6 +513,7 @@ export const CommandProvider: React.FC<{ children: React.ReactNode }> = ({ child
         resetDemoData,
         addDutyAssignment,
         addGeofence,
+        addEvent,
         reportIncident,
         acknowledgeAlert,
         escalateAlert,
